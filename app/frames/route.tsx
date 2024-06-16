@@ -204,7 +204,7 @@ const handleRequest = frames(async (ctx: any) => {
   }
 
   const addresses = data.addresses
-  console.log(addresses)
+  //console.log(addresses)
 
   const rollup: LiquidHamData = {
     balance: 0,
@@ -219,7 +219,7 @@ const handleRequest = frames(async (ctx: any) => {
     rollup.recv += stats.recv
   }
 
-  console.log(rollup)
+  //console.log(rollup)
   return {
     image: (
       <div
