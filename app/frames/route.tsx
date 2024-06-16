@@ -66,12 +66,86 @@ const getDataFromName = async (name: string): Promise<UserData|null> => {
   return getData(json.result.users)
 }
 
-const getStats = async (addr: string): Promise<LiquidHamData> => {
-  return {
-    balance: 14,
-    sent: 15,
-    recv: 29
+function objectToQueryString(params: any) {
+  return Object.entries(params)
+    .map(
+      ([key, value]: [any, any]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join("&");
+}
+
+async function fetchPaginatedData(
+  apiUrl: string,
+  addr: string,
+  onSuccess: (sent: boolean, count: number) => void,
+  onError: (err: any) => void
+) {
+  let hasNextPage = true;
+  let nextPageParams = {};
+
+  while (hasNextPage) {
+    // Construct the URL with the next page parameters
+    const queryString = Object.keys(nextPageParams).length
+      ? `?${objectToQueryString(nextPageParams)}`
+      : "";
+    const url = `${apiUrl}${queryString}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.items) {
+        console.log(data.items)
+
+        data.items.forEach((item: any) => {
+          const { decimals, value } = item.total
+          const pnt = value.length - decimals
+          const num = parseFloat(`${value.slice(0, pnt)}.${value.slice(pnt)}`)
+          if (item.from.hash.toLowerCase() === addr.toLowerCase()) {
+            onSuccess(true, num)
+          } else if (item.to.hash.toLowerCase() == addr.toLowerCase()) {
+            onSuccess(false, num)
+          }
+        });
+      }
+
+      // Check if there are more pages to fetch
+      if (data.next_page_params) {
+        nextPageParams = data.next_page_params;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (error) {
+      onError(`Error fetching data: ${error}`);
+      hasNextPage = false; // Exit loop on error
+    }
   }
+}
+const getStats = async (addr: string): Promise<LiquidHamData> => {
+  const hash = '0x7a6B7Ad9259c57fD599E1162c6375B7eA63864e4'
+  const route = `https://ham.calderaexplorer.xyz/api/v2/addresses/${addr}/token-transfers?type=ERC-721&filter=to%20%7C%20from&token=${hash}`
+  let rollup: LiquidHamData = {
+    balance: 0,
+    sent: 0,
+    recv: 0
+  }
+  await fetchPaginatedData(
+    route,
+    addr,
+    (sent: boolean, count: number) => {
+      if (sent) {
+        rollup.balance -= count
+        rollup.sent += count
+      } else {
+        rollup.balance += count
+        rollup.recv += count
+      }
+    },
+    (err: any) => console.error(err)
+  );
+  console.log(rollup)
+  return rollup
 }
 
 const handleRequest = frames(async (ctx: any) => {
@@ -141,13 +215,14 @@ const handleRequest = frames(async (ctx: any) => {
     rollup.recv += stats.recv
   }
 
+  console.log(rollup)
   return {
     image: (
       <div
         tw="flex flex-col w-full h-full justify-center items-center"
         style={{ backgroundColor: "#282a36" }}
       >
-        <div tw="flex flex-col justify-center w-full items-center h-1/2">
+        <div tw="flex flex-col justify-center w-full items-center h-2/5 pt-8">
           <span tw="text-7xl" style={{ color: "#ffb86c" }}>
             Liquid $HAM Stats
           </span>
@@ -155,31 +230,34 @@ const handleRequest = frames(async (ctx: any) => {
             @{data.name}
           </span>
         </div>
-        <div tw="flex flex-col h-1/2">
+        <div tw="flex flex-col h-1/3 pt-8">
           <div tw="flex flex-row w-full">
-            <span tw="text-6xl w-1/3 pl-16" style={{ color: "#50fa7b" }}>
+            <span tw="text-6xl w-1/3 pl-20" style={{ color: "#50fa7b" }}>
               Balance
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.balance}
+              {rollup.balance === 0 ? '0' : rollup.balance}
             </span>
           </div>
           <div tw="flex flex-row w-full">
-            <span tw="text-6xl w-1/3 pl-16" style={{ color: "#50fa7b" }}>
+            <span tw="text-6xl w-1/3 pl-20" style={{ color: "#50fa7b" }}>
               Sent
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.sent}
+              {rollup.sent === 0 ? '0' : rollup.sent}
             </span>
           </div>
           <div tw="flex flex-row w-full">
-            <span tw="text-6xl w-1/3 pl-16" style={{ color: "#50fa7b" }}>
+            <span tw="text-6xl w-1/3 pl-20" style={{ color: "#50fa7b" }}>
               Received
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.recv}
+              {rollup.recv === 0 ? '0' : rollup.recv}
             </span>
           </div>
+        </div>
+        <div tw="flex justify-end w-full pt-24 pr-4 pb-2" style={{ color: "#6272a4"}}>
+          by @masshesteria
         </div>
       </div>
     ),
