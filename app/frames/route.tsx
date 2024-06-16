@@ -83,20 +83,22 @@ async function fetchPaginatedData(
 ) {
   let hasNextPage = true;
   let nextPageParams = {};
+  const hash = '0x7a6B7Ad9259c57fD599E1162c6375B7eA63864e4'
 
   while (hasNextPage) {
     // Construct the URL with the next page parameters
     const queryString = Object.keys(nextPageParams).length
-      ? `?${objectToQueryString(nextPageParams)}`
-      : "";
+      ? `&${objectToQueryString(nextPageParams)}`
+      : `&token=${hash}`;
     const url = `${apiUrl}${queryString}`;
 
     try {
       const response = await fetch(url);
       const data = await response.json();
 
+      //console.log(data)
       if (data.items) {
-        console.log(data.items)
+        //console.log(data.items)
 
         data.items.forEach((item: any) => {
           const { decimals, value } = item.total
@@ -104,8 +106,10 @@ async function fetchPaginatedData(
           const num = parseFloat(`${value.slice(0, pnt)}.${value.slice(pnt)}`)
           if (item.from.hash.toLowerCase() === addr.toLowerCase()) {
             onSuccess(true, num)
+            //console.log('sent',num)
           } else if (item.to.hash.toLowerCase() == addr.toLowerCase()) {
             onSuccess(false, num)
+            //console.log('recv',num)
           }
         });
       }
@@ -123,8 +127,8 @@ async function fetchPaginatedData(
   }
 }
 const getStats = async (addr: string): Promise<LiquidHamData> => {
-  const hash = '0x7a6B7Ad9259c57fD599E1162c6375B7eA63864e4'
-  const route = `https://ham.calderaexplorer.xyz/api/v2/addresses/${addr}/token-transfers?type=ERC-721&filter=to%20%7C%20from&token=${hash}`
+  //const hash = '0x7a6B7Ad9259c57fD599E1162c6375B7eA63864e4'
+  const route = `https://ham.calderaexplorer.xyz/api/v2/addresses/${addr}/token-transfers?type=ERC-20&filter=to%20%7C%20from`
   let rollup: LiquidHamData = {
     balance: 0,
     sent: 0,
@@ -144,7 +148,7 @@ const getStats = async (addr: string): Promise<LiquidHamData> => {
     },
     (err: any) => console.error(err)
   );
-  console.log(rollup)
+  //console.log(rollup)
   return rollup
 }
 
