@@ -13,6 +13,7 @@ type LiquidHamData = {
   balance: number;
   sent: number;
   recv: number;
+  addr: Set<string>;
 }
 
 const getShareLink = (fid: number|null) => {
@@ -127,12 +128,12 @@ async function fetchPaginatedData(
   }
 }
 const getStats = async (addr: string): Promise<LiquidHamData> => {
-  //const hash = '0x7a6B7Ad9259c57fD599E1162c6375B7eA63864e4'
   const route = `https://ham.calderaexplorer.xyz/api/v2/addresses/${addr}/token-transfers?type=ERC-20&filter=to%20%7C%20from`
   let rollup: LiquidHamData = {
     balance: 0,
     sent: 0,
-    recv: 0
+    recv: 0,
+    addr: new Set<string>()
   }
   await fetchPaginatedData(
     route,
@@ -145,6 +146,7 @@ const getStats = async (addr: string): Promise<LiquidHamData> => {
         rollup.balance += count
         rollup.recv += count
       }
+      rollup.addr.add(addr)
     },
     (err: any) => console.error(err)
   );
@@ -209,7 +211,8 @@ const handleRequest = frames(async (ctx: any) => {
   const rollup: LiquidHamData = {
     balance: 0,
     sent: 0,
-    recv: 0
+    recv: 0,
+    addr: new Set<string>()
   }
   
   for (let i = 0; i < addresses.length; i++) {
@@ -217,6 +220,17 @@ const handleRequest = frames(async (ctx: any) => {
     rollup.balance += stats.balance
     rollup.sent += stats.sent
     rollup.recv += stats.recv
+    stats.addr.forEach(a => rollup.addr.add(a))
+  }
+
+  let addr = ''
+
+  if (rollup.addr.size > 1) {
+    addr = 'Multiple Wallets'
+  } else if (rollup.addr.size === 1) {
+    rollup.addr.forEach(a => addr = a)
+  } else if (addresses.length === 1) {
+    addr = addresses[0]
   }
 
   //console.log(rollup)
@@ -260,8 +274,13 @@ const handleRequest = frames(async (ctx: any) => {
             </span>
           </div>
         </div>
-        <div tw="flex justify-end w-full pt-24 pr-4 pb-2" style={{ color: "#6272a4"}}>
-          by @masshesteria
+        <div tw="flex flex-row w-full">
+          <span tw="text-3xl justify-start pt-26 pl-4 w-3/4" style={{ color: "#ff5555" }}>
+            {addr}
+          </span>
+          <span tw="flex justify-end pt-24 pr-4 pb-2" style={{ color: "#6272a4"}}>
+            by @masshesteria
+          </span>
         </div>
       </div>
     ),
