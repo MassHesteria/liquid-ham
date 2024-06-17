@@ -15,7 +15,6 @@ type LiquidHamData = {
   balance: number;
   sent: number;
   recv: number;
-  addr: Set<string>;
 }
 
 const getShareLink = (fid: number|null) => {
@@ -46,6 +45,7 @@ const getData = async (users: any[]|null): Promise<UserData|null> => {
 }
 
 const getAddressFromFID = async (fid: number): Promise<string> => {
+  //console.log('getAddressFromFID')
   const web3 = new Web3('https://rpc.ham.fun');
   const contractAddress = '0xCca2e3e860079998622868843c9A00dEbb591D30';
   const contract = new web3.eth.Contract(FID_Storage_ABI, contractAddress);
@@ -65,6 +65,7 @@ const getDataFromFID = async (fid: number): Promise<UserData|null> => {
 }
 
 const getDataFromName = async (name: string): Promise<UserData|null> => {
+  //console.log('getDataFromName')
   const url = `https://api.neynar.com/v2/farcaster/user/search?q=${name}&viewer_fid=3&limit=1`;
   const options = {
     method: 'GET',
@@ -142,7 +143,6 @@ const getStats = async (addr: string): Promise<LiquidHamData> => {
     balance: 0,
     sent: 0,
     recv: 0,
-    addr: new Set<string>()
   }
   await fetchPaginatedData(
     route,
@@ -155,7 +155,6 @@ const getStats = async (addr: string): Promise<LiquidHamData> => {
         rollup.balance += count
         rollup.recv += count
       }
-      rollup.addr.add(addr)
     },
     (err: any) => console.error(err)
   );
