@@ -254,7 +254,7 @@ const handleRequest = frames(async (ctx: any) => {
               Balance
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.balance === 0 ? '0' : rollup.balance}
+              {rollup.balance === 0 ? '0' : rollup.balance.toFixed(3)}
             </span>
           </div>
           <div tw="flex flex-row w-full">
@@ -262,7 +262,7 @@ const handleRequest = frames(async (ctx: any) => {
               Sent
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.sent === 0 ? '0' : rollup.sent}
+              {rollup.sent === 0 ? '0' : rollup.sent.toFixed(3)}
             </span>
           </div>
           <div tw="flex flex-row w-full">
@@ -270,7 +270,7 @@ const handleRequest = frames(async (ctx: any) => {
               Received
             </span>
             <span tw="text-6xl w-1/3 items-center justify-center" style={{ color: "#8be9fd" }}>
-              {rollup.recv === 0 ? '0' : rollup.recv}
+              {rollup.recv === 0 ? '0' : rollup.recv.toFixed(3)}
             </span>
           </div>
         </div>
