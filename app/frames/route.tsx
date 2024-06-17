@@ -1,12 +1,14 @@
 /* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
 import { frames, getHostName } from "../frames";
-import { AllowedFrameButtonItems } from "frames.js/types";
+//import { AllowedFrameButtonItems } from "frames.js/types";
+import { Web3 } from 'web3';
+import { FID_Storage_ABI } from "./fid-storage-abi";
 
 type UserData = {
   fid: number;
   name: string;
-  addresses: string[];
+  address: string;
 }
 
 type LiquidHamData = {
@@ -36,11 +38,18 @@ const getData = async (users: any[]|null): Promise<UserData|null> => {
     return {
       fid: users[0].fid,
       name: users[0].username,
-      addresses: users[0].verified_addresses.eth_addresses
+      address: await getAddressFromFID(users[0].fid)
     }
   }
 
   return null
+}
+
+const getAddressFromFID = async (fid: number): Promise<string> => {
+  const web3 = new Web3('https://rpc.ham.fun');
+  const contractAddress = '0xCca2e3e860079998622868843c9A00dEbb591D30';
+  const contract = new web3.eth.Contract(FID_Storage_ABI, contractAddress);
+  return await contract.methods.fids(fid).call()
 }
 
 const getDataFromFID = async (fid: number): Promise<UserData|null> => {
@@ -172,7 +181,7 @@ const handleRequest = frames(async (ctx: any) => {
       data = {
         fid: message.requesterFid,
         name: message.requesterUserData.username,
-        addresses: message.requesterVerifiedAddresses
+        address: await getAddressFromFID(message.requesterFid)
       }
     }
   }
@@ -205,35 +214,9 @@ const handleRequest = frames(async (ctx: any) => {
     };
   }
 
-  const addresses = data.addresses
-  //console.log(addresses)
-
-  const rollup: LiquidHamData = {
-    balance: 0,
-    sent: 0,
-    recv: 0,
-    addr: new Set<string>()
-  }
-  
-  for (let i = 0; i < addresses.length; i++) {
-    const stats = await getStats(addresses[i])
-    rollup.balance += stats.balance
-    rollup.sent += stats.sent
-    rollup.recv += stats.recv
-    stats.addr.forEach(a => rollup.addr.add(a))
-  }
-
-  let addr = ''
-
-  if (rollup.addr.size > 1) {
-    addr = 'Multiple Wallets'
-  } else if (rollup.addr.size === 1) {
-    rollup.addr.forEach(a => addr = a)
-  } else if (addresses.length === 1) {
-    addr = addresses[0]
-  }
-
+  const rollup = await getStats(data.address)
   //console.log(rollup)
+
   return {
     image: (
       <div
@@ -276,6 +259,7 @@ const handleRequest = frames(async (ctx: any) => {
         </div>
         <div tw="flex flex-row w-full">
           <span tw="text-3xl justify-start pt-26 pl-4 w-3/4" style={{ color: "#ff5555" }}>
+          {/*data.address*/}
           </span>
           <span tw="flex justify-end pt-24 pr-4 pb-2" style={{ color: "#6272a4"}}>
             by @masshesteria
