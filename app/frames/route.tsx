@@ -276,7 +276,6 @@ const handleRequest = frames(async (ctx: any) => {
         </div>
         <div tw="flex flex-row w-full">
           <span tw="text-3xl justify-start pt-26 pl-4 w-3/4" style={{ color: "#ff5555" }}>
-            {addr}
           </span>
           <span tw="flex justify-end pt-24 pr-4 pb-2" style={{ color: "#6272a4"}}>
             by @masshesteria
