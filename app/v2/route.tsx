@@ -16,6 +16,7 @@ type UserData = {
 }
 
 const getShareLink = (fid: number|null, name: string|null) => {
+  // Use the timestamp to force a refresh when sharing
   let baseRoute = getHostName() + `?ts=${Date.now()}`;
   if (fid != null) {
     baseRoute += `&fid=${fid}&name=${name}`
@@ -80,8 +81,7 @@ const getDataFromName = async (name: string): Promise<UserData|null> => {
 }
 
 const handleRequest = frames(async (ctx: any) => {
-  const timestamp = `${Date.now()}`;
-  const baseRoute = getHostName() + "/v2?ts=" + timestamp;
+  const baseRoute = getHostName() + "/v2"
   const message = ctx?.message
   let data: UserData|null = null
 

@@ -22,8 +22,8 @@ export async function generateMetadata({ searchParams }: Props) {
 
   const metaData = await fetchMetadata(routeUrl);
   return {
-    title: "Liquid $HAM Stats",
-    description: "Liquid $HAM Stats in a frame",
+    title: "Daily $HAM Stats",
+    description: "Daily $HAM Stats in a frame",
     metadataBase: new URL(getHostName()),
     other: metaData,
   };
@@ -38,7 +38,7 @@ export default async function Page() {
         <a className="text-red-600 text-2xl no-underline hover:underline pr-8" href="https://github.com/masshesteria/liquid-ham">Source code</a>
         {/*<a className="text-purple-600 text-2xl no-underline hover:underline" href="https://warpcast.com/masshesteria/0xec2772dc">Original cast</a>*/}
       </div>
-      {/*<img className="mt-4 border border-black" style={{ maxWidth: '80%' }} alt="Liquid $HAM Stats" src="/page?u=masshesteria&a=220&b=219"></img>*/}
+      {/*<img className="mt-4 border border-black" style={{ maxWidth: '80%' }} alt="Daily $HAM Stats" src="/page?u=masshesteria&a=220&b=219"></img>*/}
       </center>
     </div>
   )

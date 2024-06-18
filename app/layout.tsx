@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Liquid $HAM Stats",
-  description: "Liquid $HAM Stats in a frame",
+  title: "Daily $HAM Stats",
+  description: "Daily $HAM Stats in a frame",
 };
 
 export default function RootLayout({
