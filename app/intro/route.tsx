@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 

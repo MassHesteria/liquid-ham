@@ -11,6 +11,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/stats/:fid',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=180, max-age=180, stale-while-revalidate=30',
+          },
+        ],
+      },
     ]
   }
 };
