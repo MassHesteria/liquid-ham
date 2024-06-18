@@ -12,7 +12,8 @@
     "frames.js": "^0.17.0",
     "next": "14.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "web3": "^4.9.0"
   },
   "devDependencies": {
     "@types/node": "^20",
