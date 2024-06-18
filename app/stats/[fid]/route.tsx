@@ -1,5 +1,6 @@
+import { getHostName } from "@/app/frames";
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type UserData = {
   fid: number;
@@ -63,26 +64,10 @@ export async function GET(req: NextRequest,
   }
 
   if (data === null) {
-    return new ImageResponse(
-      (
-        <div
-          tw="flex flex-col w-full h-full justify-center items-center"
-          style={{ backgroundColor: "#282a36" }}
-        >
-          <div tw="flex">
-            <span tw="text-7xl" style={{ color: "#f8f8f2" }}>
-              Daily $HAM Stats
-            </span>
-          </div>
-          <div tw="flex">
-            <span tw="text-5xl" style={{ color: "#ffb86c" }}>by @masshesteria</span>
-          </div>
-        </div>
-      )
-    );
+    return NextResponse.redirect(getHostName() + '/intro')
   }
 
-  return new ImageResponse(
+  const res = new ImageResponse(
       <div
         tw="flex flex-col w-full h-full justify-center items-center"
         style={{ backgroundColor: "#282a36" }}
@@ -139,4 +124,6 @@ export async function GET(req: NextRequest,
         </div>
       </div>
   )
+  res.headers.set('Cache-Control', 'public, max-age=180, s-maxage=180, stale-while-revalidate=30');
+  return res
 }
