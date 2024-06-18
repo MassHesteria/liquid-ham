@@ -106,21 +106,7 @@ const handleRequest = frames(async (ctx: any) => {
 
   if (data === null) {
     return {
-      image: (
-        <div
-          tw="flex flex-col w-full h-full justify-center items-center"
-          style={{ backgroundColor: "#282a36" }}
-        >
-          <div tw="flex">
-            <span tw="text-7xl" style={{ color: "#f8f8f2" }}>
-              Daily $HAM Stats
-            </span>
-          </div>
-          <div tw="flex">
-            <span style={{ color: "#ffb86c" }}>by @masshesteria</span>
-          </div>
-        </div>
-      ),
+      image: getHostName() + `/intro`,
       imageOptions: {
         aspectRatio: "1.91:1",
       },
