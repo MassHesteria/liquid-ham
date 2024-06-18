@@ -12,7 +12,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/stats/:fid',
+        source: '/stats/:fid*',
         headers: [
           {
             key: 'Cache-Control',
