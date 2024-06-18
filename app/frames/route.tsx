@@ -144,20 +144,26 @@ const getStats = async (addr: string): Promise<LiquidHamData> => {
     sent: 0,
     recv: 0,
   }
-  await fetchPaginatedData(
-    route,
-    addr,
-    (sent: boolean, count: number) => {
-      if (sent) {
-        rollup.balance -= count
-        rollup.sent += count
-      } else {
-        rollup.balance += count
-        rollup.recv += count
-      }
-    },
-    (err: any) => console.error(err)
-  );
+  if (
+    addr != undefined &&
+    addr !== "" &&
+    addr !== "0x0000000000000000000000000000000000000000"
+  ) {
+    await fetchPaginatedData(
+      route,
+      addr,
+      (sent: boolean, count: number) => {
+        if (sent) {
+          rollup.balance -= count;
+          rollup.sent += count;
+        } else {
+          rollup.balance += count;
+          rollup.recv += count;
+        }
+      },
+      (err: any) => console.error(err)
+    );
+  }
   //console.log(rollup)
   return rollup
 }

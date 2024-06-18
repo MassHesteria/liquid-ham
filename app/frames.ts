@@ -21,7 +21,7 @@ export const getHostName = (): string => {
 //-------------------------------------------------------------------
  
 export const frames = createFrames({
-  basePath: "/frames",
+  basePath: "/v2",
   middleware: [farcasterHubContext(
     process.env['VERCEL_REGION'] ? {} : {
     hubHttpUrl: 'http://localhost:3010/hub'
