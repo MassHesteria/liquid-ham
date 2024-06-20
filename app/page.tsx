@@ -1,32 +1,42 @@
-import { fetchMetadata } from "frames.js/next";
 import { getHostName } from "./frames";
 
-type Props = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
-export async function generateMetadata({ searchParams }: Props) {
-  const routeUrl = new URL("/v2", getHostName())
-
-  for (let key in searchParams) {
-    let value = searchParams[key];
-    if (value !== undefined) {
-      if (Array.isArray(value)) {
-        value.forEach(val => routeUrl.searchParams.append(key, val));
-      } else {
-        routeUrl.searchParams.append(key, value);
-      }
-    }
+export async function generateMetadata() {
+  const postUrl = getHostName() + '/frames'
+  const imageUrl = getHostName() + '/outro.png'
+  if (process.env['VERCEL_URL']) {
+    const vars = ['VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL']
+    console.log('')
+    vars.forEach(p => console.log(p, process.env[p]))
+    vars.map(p => 'NEXT_PUBLIC_' + p).forEach(p => console.log(p, process.env[p]))
+    console.log('')
   }
-
-  const metaData = await fetchMetadata(routeUrl);
   return {
     title: "Daily $HAM Stats",
     description: "Daily $HAM Stats in a frame",
-    metadataBase: new URL(getHostName()),
-    other: metaData,
+    openGraph: {
+      title: "Daily $HAM Stats",
+      images: [imageUrl],
+    },
+    other: {
+      "fc:frame": "vNext",
+      "fc:frame:image": imageUrl,
+      "fc:frame:post_url": postUrl,
+      "fc:frame:image:aspect_ratio": "1.91:1",
+      "fc:frame:button:1": "Open Ham Stats Frame",
+      "fc:frame:button:1:action": "link",
+      "fc:frame:button:1:target": 'https://warpcast.com/nikolaiii/0xf51d0528',
+      /*"hey:portal": "vLatest",
+      "hey:portal:image": imageUrl,
+      "hey:portal:post_url": postUrl,
+      "hey:portal:button:1": "SHARE",
+      "hey:portal:button:1:type": "link",
+      "hey:portal:button:1:target": HOST,
+      "hey:portal:button:2": "POST",
+      "hey:portal:button:2:type": "submit",*/
+    },
+
   };
+
 }
 
 export default async function Page() {
